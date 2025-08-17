@@ -1,6 +1,26 @@
 import pandas as pd
+import numpy as np
 
 # Functions go here
+
+
+def num_check(question):
+    """Checks users enter an integer"""
+
+    error = "Oops - please enter an integer"
+
+    while True:
+
+        try:
+            # return the response if it's an integer
+            response = int(input(question))
+
+            return response
+
+        except ValueError:
+            print(error)
+
+
 def make_statement(statement, decoration):
     """Emphasises headings by adding decoration at the start and end"""
     print(f"{decoration * 3} {statement} {decoration * 3}")
@@ -49,34 +69,53 @@ def not_blank(question):
         print("Sorry, this can't be blank.  Please try again.\n")
 
 
-def int_check(question):
+def int_check(question, low, high):
     """Checks users enter an integer"""
-    error = "Oops - please enter an integer."
+    error = f"Oops - please enter a number between {low} and {high}."
     while True:
         try:
             response = int(input(question))
-            return response
+
+            if response >= low or response <= high:
+                return response
+            else:
+                print(error)
+
         except ValueError:
             print(error)
 
 
-def show_menu():
+def show_menu(variable_name, list1, list2):
     """Shows a menu for users to see what they can order"""
-    pizzas = ['Cheese', 'Vege', 'Meat Lovers', 'Pepperoni']
-    pizza_prices = [7, 8.5, 10, 6]
-    pizza_menu_dict = {
-        'Pizza': pizzas,
-        'Pizza Prices': pizza_prices
+
+    base_name = "_menu_dict"
+    dynamic_key = variable_name + base_name
+    dynamic_key = {
+        'Pizza': list1,
+        'Pizza Prices': list2
     }
-    pizza_menu_frame = pd.DataFrame(pizza_menu_dict)
+    completed_menu_frame = pd.DataFrame(dynamic_key)
+
+    # Rearranging index
+    completed_menu_frame.index = np.arange(1, len(completed_menu_frame) + 1)
     print()
     make_statement("Menu", "📋")
-    print(pizza_menu_frame)
+    print(completed_menu_frame)
 
 
 # Variables
 MAX_PIZZAS = 5
 order_type_ans = ('pickup', 'delivery')
+
+# Variable lists
+
+pizzas = ['Cheese', 'Italian', 'Meat Lovers', 'Pepperoni', 'Ham & Cheese', 'Vegetable',
+          'Hawaiian', 'Chicken', 'Double Cheese', 'Spicey']
+pizza_prices = [7, 8.5, 10, 6, 7, 7.5, 9.5, 12, 9, 13.5]
+
+extras = ['Fries', 'Onion rings', 'Ice Cream']
+
+extra_prices = [6, 7, 8.5]
 
 # Main routine
 make_statement("Pizza Program", "🍕")
@@ -94,10 +133,14 @@ name = not_blank("What is the name for this order? ")
 order_type = string_check("Is this order pickup or delivery? ", order_type_ans, 1)
 
 if order_type == "pickup":
-    phone_number = int_check("What is your phone number? ")
+    phone_number = num_check("What is your phone number? ")
 else:
     phone_number = int_check("What is your phone number? ")
     address = not_blank("Please enter your address: ")
     print("There is a $9 surcharge for delivery.")
 
-show_menu()
+show_menu("pizza", pizzas, pizza_prices)
+
+user_selection = int_check("Select a pizza: ", 1, 10)
+
+print(f"You selected {pizzas[user_selection - 1]} ${pizza_prices[user_selection - 1]}")
