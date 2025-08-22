@@ -108,21 +108,34 @@ def show_extras_menu(extras, extra_prices):
     print(completed_extras_frame)
 
 
+def show_total_costs(pizzas, pizza_prices,extras, extra_prices):
+    """Shows the total order """
+    total_dict = {
+        'Pizza': pizzas,
+        'Pizza Prices': pizza_prices,
+        'Extras': extras,
+        'Extra Prices': extra_prices
+    }
+    total_costs_frame = pd.DataFrame(total_dict)
+
+    # Rearranging index
+    total_costs_frame.index = np.arange(1, len(total_costs_frame) + 1)
+    print()
+    make_statement("Total Costs", "🧾")
+    print(total_costs_frame)
+
+
 def get_extras_selection(extras, extra_prices):
     """Allows user to select extras and returns the total cost of selected extras"""
     total_extras_cost = 0
     selected_extras = []
 
-    while True:
-        show_extras_menu(extras, extra_prices)
-        user_choice = int_check("Select an extra (0 to finish): ", 0, len(extras))
+    show_extras_menu(extras, extra_prices)
+    user_choice = int_check("Select an extra (0 to finish): ", 0, len(extras))
 
-        if user_choice == 0:
-            break
-
-        selected_extras.append(extras[user_choice - 1])
-        total_extras_cost += extra_prices[user_choice - 1]
-        print(f"Added {extras[user_choice - 1]} for ${extra_prices[user_choice - 1]}")
+    selected_extras.append(extras[user_choice - 1])
+    total_extras_cost += extra_prices[user_choice - 1]
+    print(f"Added {extras[user_choice - 1]} for ${extra_prices[user_choice - 1]}")
 
     return selected_extras, total_extras_cost
 
@@ -132,6 +145,12 @@ MAX_PIZZAS = 5
 order_type_ans = ('pickup', 'delivery')
 total_pizza_made = 0
 MAX_PER_ORDER = 5
+
+user_pizza_list = []
+user_pizza_list_cost = []
+
+user_extras_list = []
+user_extras_list_cost = []
 # buy max 3 pizzas but if less total remaining buy less
 
 max_remaining = MAX_PIZZAS - total_pizza_made
@@ -166,7 +185,8 @@ if order_type == "pickup":
 else:
     phone_number = num_check("What is your phone number? ")
     address = not_blank("Please enter your address: ")
-    print("There is a $9 surcharge for delivery.")
+    delivery_surcharge = 9
+    print(f"There is a ${delivery_surcharge} surcharge for delivery.")
 
 num_of_pizzas = int_check("How many pizzas? ", 1, 5)
 
@@ -176,16 +196,32 @@ for i in range(num_of_pizzas):
 
     user_selection = int_check("Select a pizza: ", 1, 10)
 
+    pizza = user_pizza_list.append(pizzas[user_selection - 1])
+    pizza_cost = user_pizza_list_cost.append(pizza_prices[user_selection - 1])
+
     print(f"You selected {pizzas[user_selection - 1]} ${pizza_prices[user_selection - 1]}")
 
     # Get product details
-    quantity_made = int_check(f"Quantity being made (Max {max_allowed}): ", 1, max_allowed)
 
-    # Get extras
-    selected_extras, total_extras_cost = get_extras_selection(extras, extra_prices)
+    want_extras = string_check("Do you want extras? ")
 
+    if want_extras == "yes":
+        # Get extras
+        selected_extras, total_extras_cost = get_extras_selection(extras, extra_prices)
+        chosen_extras = extras[user_selection - 1]
+        extra_costs = extra_prices[user_selection - 1]
+    else:
+        chosen_extras = "NA"
+        extra_costs = 0
 
-# Calculate total cost
-total_cost = (pizza_prices[user_selection - 1] * quantity_made) + total_extras_cost
+    user_extras_list.append(chosen_extras)
+    user_extras_list_cost.append(extra_costs)
+
+# Display Itemised costs
+
+show_total_costs(user_pizza_list, user_pizza_list_cost, user_extras_list, user_extras_list_cost)
+if order_type == "delivery":
+    print(f"\nThere is a delivery surcharge of: ${delivery_surcharge:.2f}")
+total_cost = sum(user_pizza_list_cost )+ sum(user_extras_list_cost)
 print(f"\nYour total order cost is: ${total_cost:.2f}")
-print(f"Extras selected: {', '.join(selected_extras) if selected_extras else 'None'}")
+# print(f"Extras selected: {', '.join(selected_extras) if selected_extras else 'None'}")
