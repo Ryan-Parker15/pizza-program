@@ -237,4 +237,18 @@ if order_type == "delivery":
 total_cost = sum(user_pizza_list_cost )+ sum(user_extras_list_cost)
 print(f"\nYour total order cost is: ${total_cost:.2f}")
 
+payment_type = string_check("Are you paying with cash or credit? ", payment_type_ans, 1)
 
+if payment_type == "cash":
+    print("You picked cash")
+
+else:
+    print("You picked credit")
+    card_number = num_check("What is your card number? ")
+    credit_surcharge = 3
+    print(f"There is a ${credit_surcharge} surcharge for credit.")
+
+    print(f"\nThere is a credit surcharge of: ${credit_surcharge:.2f}")
+    print(f"\nThere is a delivery surcharge of: ${delivery_surcharge:.2f}")
+    total_cost = sum(user_pizza_list_cost) + sum(user_extras_list_cost)
+    print(f"\nYour total order cost is: ${total_cost:.2f}")
