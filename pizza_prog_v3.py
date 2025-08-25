@@ -139,11 +139,15 @@ def get_extras_selection(extras, extra_prices):
     selected_extras = []
 
     show_extras_menu(extras, extra_prices)
-    user_choice = int_check("Select an extra: ", 1, 4)
+    user_choice = int_check("Select an extra: ", 1, len(extras))
 
-    # selected_extras.append(extras[user_choice - 1])
-    total_extras_cost += extra_prices[user_choice - 1]
-    print(f"Added {extras[user_choice - 1]} for ${extra_prices[user_choice - 1]}")
+    chosen_extra = extras[user_choice - 1]
+    chosen_extra_cost = extra_prices[user_choice - 1]
+
+    selected_extras.append(chosen_extra)
+    total_extras_cost += chosen_extra_cost
+
+    print(f"Added {chosen_extra} for ${chosen_extra_cost}")
 
     return selected_extras, total_extras_cost
 

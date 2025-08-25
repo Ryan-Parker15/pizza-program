@@ -39,6 +39,7 @@ def string_check(question, valid_answers=('yes', 'no'), num_letters=1):
 
 
 def instructions():
+    """Displays instructions if user says yes"""
     make_statement("Instructions", "ℹ️")
     print('''
 
@@ -132,20 +133,23 @@ def show_total_costs(user_pizza_list, user_pizza_list_cost,user_extras_list, use
     }
     total_costs_frame = pd.DataFrame(total_dict)
 
+    # Rearranging index
+    total_costs_frame.index = np.arange(1, len(total_costs_frame) + 1)
+    print()
+    make_statement("Total Costs", "🧾")
+    print(total_costs_frame)
+
 
 def get_extras_selection(extras, extra_prices):
-    """Allows user to select extras and returns the total cost of selected extras"""
-    total_extras_cost = 0
-    selected_extras = []
-
+    """Allows user to select ONE extra and returns (name, cost)."""
     show_extras_menu(extras, extra_prices)
-    user_choice = int_check("Select an extra: ", 1, 4)
+    user_choice = int_check("Select an extra: ", 1, len(extras))
 
-    # selected_extras.append(extras[user_choice - 1])
-    total_extras_cost += extra_prices[user_choice - 1]
-    print(f"Added {extras[user_choice - 1]} for ${extra_prices[user_choice - 1]}")
+    chosen_extra = extras[user_choice - 1]
+    chosen_cost = extra_prices[user_choice - 1]
 
-    return selected_extras, total_extras_cost
+    print(f"Added {chosen_extra} for ${chosen_cost}")
+    return chosen_extra, chosen_cost
 
 
 # Variables
@@ -176,6 +180,9 @@ pizza_prices = [7, 8.5, 10, 6, 7, 7.5, 9.5, 12, 9, 13.5]
 extras = ['Fries', 'Onion rings', 'Ice Cream']
 
 extra_prices = [6, 7, 8.5]
+
+credit_surcharge = 0
+delivery_surcharge = 0
 
 # Main routine
 make_statement("Pizza Program", "🍕")
@@ -216,39 +223,34 @@ for i in range(num_of_pizzas):
     want_extras = string_check("Do you want extras? ")
 
     if want_extras == "yes":
-        # Get extras
-        selected_extras, total_extras_cost = get_extras_selection(extras, extra_prices)
-        chosen_extras = extras[user_selection - 1]
-        extra_costs = extra_prices[user_selection - 1]
+        chosen_extras, extra_costs = get_extras_selection(extras, extra_prices)
     else:
-        chosen_extras = "NA"
-        extra_costs = 0
+        chosen_extras, extra_costs = "NA", 0
 
     user_extras_list.append(chosen_extras)
     user_extras_list_cost.append(extra_costs)
 
 # Display Itemised costs
-
 show_total_costs(user_pizza_list, user_pizza_list_cost, user_extras_list, user_extras_list_cost)
+
 if order_type == "delivery":
     print(f"\nThere is a delivery surcharge of: ${delivery_surcharge:.2f}")
 
+# Calculate subtotal before payment method
+subtotal = sum(user_pizza_list_cost) + sum(user_extras_list_cost) + delivery_surcharge
+print(f"\nSubtotal: ${subtotal:.2f}")
 
-total_cost = sum(user_pizza_list_cost )+ sum(user_extras_list_cost)
-print(f"\nYour total order cost is: ${total_cost:.2f}")
-
+# Ask payment type
 payment_type = string_check("Are you paying with cash or credit? ", payment_type_ans, 1)
 
 if payment_type == "cash":
     print("You picked cash")
-
 else:
     print("You picked credit")
     card_number = num_check("What is your card number? ")
     credit_surcharge = 3
     print(f"There is a ${credit_surcharge} surcharge for credit.")
 
-    print(f"\nThere is a credit surcharge of: ${credit_surcharge:.2f}")
-    print(f"\nThere is a delivery surcharge of: ${delivery_surcharge:.2f}")
-    total_cost = sum(user_pizza_list_cost) + sum(user_extras_list_cost)
-    print(f"\nYour total order cost is: ${total_cost:.2f}")
+# Final total
+total_cost = subtotal + credit_surcharge
+print(f"\nYour total order cost is: ${total_cost:.2f}")
